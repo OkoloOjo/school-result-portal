@@ -1,70 +1,332 @@
+/* ========================================
+   SCHOOL RESULT PORTAL
+   Modern Responsive Styles
+======================================== */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    background: #f4f7f6;
-    color: #222;
+:root {
+    --primary: #0b7a53;
+    --primary-dark: #075c3e;
+    --primary-light: #e8f6f0;
+    --secondary: #333;
+    --background: #f4f7f6;
+    --white: #ffffff;
+    --text: #222;
+    --muted: #667085;
+    --border: #d9e2de;
+    --success: #16803c;
+    --danger: #c62828;
 }
 
+/* ========================================
+   BODY
+======================================== */
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--background);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ========================================
+   HEADER
+======================================== */
+
 .header {
-    background: #0b7a53;
-    color: white;
+    background: linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-dark)
+    );
+
+    color: var(--white);
     text-align: center;
-    padding: 30px 20px;
+    padding: 45px 20px;
 }
 
 .header h1 {
-    margin-bottom: 10px;
+    font-size: 2rem;
+    margin-bottom: 8px;
 }
 
+.header p {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+/* ========================================
+   MAIN CONTAINER
+======================================== */
+
 .container {
+    width: 100%;
     max-width: 900px;
     margin: 40px auto;
     padding: 20px;
 }
 
-.hero {
-    background: white;
-    padding: 40px 25px;
-    text-align: center;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+/* ========================================
+   CARDS
+======================================== */
+
+.hero,
+.form-card {
+    background: var(--white);
+    padding: 40px 30px;
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.06),
+        0 12px 30px rgba(0, 0, 0, 0.04);
 }
 
-.hero h2 {
-    margin-bottom: 15px;
+.hero {
+    text-align: center;
+}
+
+.hero h2,
+.form-card h2 {
+    color: var(--primary-dark);
+    margin-bottom: 12px;
+    font-size: 1.5rem;
 }
 
 .hero p {
-    margin-bottom: 25px;
+    color: var(--muted);
+    margin-bottom: 28px;
 }
+
+/* ========================================
+   BUTTONS
+======================================== */
 
 .buttons {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    align-items: center;
+    gap: 14px;
     flex-wrap: wrap;
 }
 
 .btn {
     display: inline-block;
-    padding: 12px 22px;
-    background: #0b7a53;
-    color: white;
+    border: none;
+    padding: 13px 24px;
+
+    background: var(--primary);
+    color: var(--white);
+
     text-decoration: none;
-    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: bold;
+
+    border-radius: 8px;
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(11, 122, 83, 0.25);
+}
+
+.btn:active {
+    transform: translateY(0);
 }
 
 .btn.secondary {
-    background: #333;
+    background: var(--secondary);
 }
+
+.btn.secondary:hover {
+    background: #111;
+}
+
+/* ========================================
+   FORMS
+======================================== */
+
+.form-card {
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.form-card form {
+    margin-top: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label,
+form label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: bold;
+    color: #344054;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 13px 14px;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    background: var(--white);
+    color: var(--text);
+
+    font-size: 1rem;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(11, 122, 83, 0.12);
+}
+
+input::placeholder {
+    color: #98a2b3;
+}
+
+/* ========================================
+   FORM BUTTON
+======================================== */
+
+form .btn {
+    margin-top: 5px;
+}
+
+/* ========================================
+   MESSAGES
+======================================== */
+
+#message,
+#resultMessage {
+    margin-top: 18px;
+    padding: 12px 15px;
+
+    border-radius: 8px;
+
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Success message */
+
+.success {
+    background: #e9f8ef;
+    color: var(--success);
+    border: 1px solid #b7e4c7;
+}
+
+/* Error message */
+
+.error {
+    background: #fff0f0;
+    color: var(--danger);
+    border: 1px solid #f0b8b8;
+}
+
+/* ========================================
+   FOOTER
+======================================== */
 
 footer {
     text-align: center;
-    padding: 20px;
-    margin-top: 40px;
+    padding: 25px 20px;
+    margin-top: 50px;
+
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+
+@media (max-width: 600px) {
+
+    .header {
+        padding: 35px 18px;
+    }
+
+    .header h1 {
+        font-size: 1.6rem;
+    }
+
+    .container {
+        margin: 25px auto;
+        padding: 15px;
+    }
+
+    .hero,
+    .form-card {
+        padding: 28px 20px;
+        border-radius: 12px;
+    }
+
+    .hero h2,
+    .form-card h2 {
+        font-size: 1.3rem;
+    }
+
+    .buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    footer {
+        margin-top: 30px;
+    }
+}
+
+/* ========================================
+   SMALL PHONE
+======================================== */
+
+@media (max-width: 380px) {
+
+    .header h1 {
+        font-size: 1.4rem;
+    }
+
+    .header p {
+        font-size: 0.9rem;
+    }
+
+    .hero,
+    .form-card {
+        padding: 24px 16px;
+    }
+
+    input,
+    select {
+        font-size: 0.95rem;
+    }
 }
