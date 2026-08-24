@@ -3,8 +3,12 @@ const db = require("../database/database");
 
 const router = express.Router();
 
-// Add a result
+// ========================================
+// ADD A RESULT
+// ========================================
+
 router.post("/", (req, res) => {
+
     const {
         studentId,
         subject,
@@ -12,6 +16,7 @@ router.post("/", (req, res) => {
     } = req.body;
 
     try {
+
         const statement = db.prepare(`
             INSERT INTO results
             (student_id, subject, score)
@@ -29,6 +34,7 @@ router.post("/", (req, res) => {
         });
 
     } catch (error) {
+
         console.error(error);
 
         res.status(500).json({
@@ -37,7 +43,11 @@ router.post("/", (req, res) => {
     }
 });
 
-module.exports = router;// Get results for a student
+
+// ========================================
+// GET RESULTS FOR A STUDENT
+// ========================================
+
 router.get("/:studentId", (req, res) => {
 
     const { studentId } = req.params;
@@ -58,7 +68,6 @@ router.get("/:studentId", (req, res) => {
             return res.status(404).json({
                 error: "No result found for this student."
             });
-
         }
 
         res.json({
@@ -76,3 +85,6 @@ router.get("/:studentId", (req, res) => {
     }
 });
 
+
+// Export router AFTER all routes
+module.exports = router;
