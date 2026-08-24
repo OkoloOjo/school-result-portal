@@ -1,106 +1,48 @@
-const loginForm = document.getElementById("loginForm");
+const studentForm = document.getElementById("studentForm");
 
-if (loginForm) {
-
-    loginForm.addEventListener("submit", function (event) {
-
+if (studentForm) {
+    studentForm.addEventListener("submit", async function (event) {
         event.preventDefault();
 
-        const username =
-            document.getElementById("username").value;
-
-        const password =
-            document.getElementById("password").value;
-
-        const loginMessage =
-            document.getElementById("loginMessage");
-
-        // MVP login credentials
-        if (username === "teacher" && password === "1234") {
-
-            loginMessage.textContent =
-                "Login successful!";
-
-            setTimeout(function () {
-                window.location.href = "dashboard.html";
-            }, 500);
-
-        } else {
-
-            loginMessage.textContent =
-                "Invalid username or password.";
-
-        }
-
-    });
-
-}
-
-
-// Enter Result Form
-const resultForm = document.getElementById("resultForm");
-
-if (resultForm) {
-
-    resultForm.addEventListener("submit", async function (event) {
-
-        event.preventDefault();
-
-        const studentId =
-            document.getElementById("studentId").value.trim();
-
-        const subject =
-            document.getElementById("subject").value.trim();
-
-        const score =
-            Number(document.getElementById("score").value);
-
-        const resultMessage =
-            document.getElementById("resultMessage");
+        const studentId = document.getElementById("studentId").value;
+        const fullName = document.getElementById("fullName").value;
+        const gender = document.getElementById("gender").value;
+        const className = document.getElementById("className").value;
+        const session = document.getElementById("session").value;
+        const term = document.getElementById("term").value;
 
         try {
-
-            const response = await fetch("/api/results", {
-
+            const response = await fetch("/api/students", {
                 method: "POST",
-
                 headers: {
                     "Content-Type": "application/json"
                 },
-
                 body: JSON.stringify({
-                    studentId: studentId,
-                    subject: subject,
-                    score: score
+                    studentId,
+                    fullName,
+                    gender,
+                    className,
+                    session,
+                    term
                 })
-
             });
 
-            const result = await response.json();
+            const data = await response.json();
+            const message = document.getElementById("message");
 
             if (response.ok) {
-
-                resultMessage.textContent =
-                    result.message;
-
-                resultForm.reset();
-
+                message.textContent = data.message;
+                studentForm.reset();
             } else {
-
-                resultMessage.textContent =
-                    result.error;
-
+                message.textContent =
+                    data.error || "Unable to add student.";
             }
 
         } catch (error) {
-
             console.error(error);
 
-            resultMessage.textContent =
+            document.getElementById("message").textContent =
                 "Unable to connect to the server.";
-
         }
-
     });
-
 }

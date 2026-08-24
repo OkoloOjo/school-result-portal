@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Student - School Result Portal</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header class="header">
+        <h1>Add Student</h1>
+        <p>Register a new student</p>
+    </header>
+
+    <main class="container">
+
+        <section class="hero">
+
+            <h2>Student Information</h2>
+
+            <form id="studentForm">
+
+                <p>
+                    <label for="studentId">Student ID</label>
+                </p>
+
+                <p>
+                    <input type="text" id="studentId"
+                        placeholder="e.g. STU001" required>
+                </p>
+
+                <p>
+                    <label for="fullName">Full Name</label>
+                </p>
+
+                <p>
+                    <input type="text" id="fullName"
+                        placeholder="Enter student's full name" required>
+                </p>
+
+                <p>
+                    <label for="gender">Gender</label>
+                </p>
+
+                <p>
+                    <select id="gender" required>
+                        <option value="">Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </p>
+
+                <p>
+                    <label for="className">Class</label>
+                </p>
+
+                <p>
+                    <input type="text" id="className"
+                        placeholder="e.g. JSS 1" required>
+                </p>
+
+                <p>
+                    <label for="session">Academic Session</label>
+                </p>
+
+                <p>
+                    <input type="text" id="session"
+                        placeholder="e.g. 2026/2027" required>
+                </p>
+
+                <p>
+                    <label for="term">Term</label>
+                </p>
+
+                <p>
+                    <select id="term" required>
+                        <option value="">Select term</option>
+                        <option value="First Term">First Term</option>
+                        <option value="Second Term">Second Term</option>
+                        <option value="Third Term">Third Term</option>
+                    </select>
+                </p>
+
+                <div class="buttons">
+
+                    <button type="submit" class="btn">
+                        Add Student
+                    </button>
+
+                    <a href="dashboard.html" class="btn secondary">
+                        Back to Dashboard
+                    </a>
+
+                </div>
+
+            </form>
+
+            <p id="message"></p>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2026 School Result Portal</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+
+</body>
+
+</html>

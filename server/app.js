@@ -1,5 +1,3 @@
-
-
 const express = require("express");
 const path = require("path");
 
@@ -12,8 +10,8 @@ const PORT = process.env.PORT || 3000;
 // Allow JSON requests
 app.use(express.json());
 
-// Serve frontend from public folder
-app.use(express.static(path.join(__dirname, "../public")));
+// Serve frontend from client folder
+app.use(express.static(path.join(__dirname, "../client")));
 
 // Student API
 app.use("/api/students", studentsRouter);
@@ -24,7 +22,7 @@ app.use("/api/results", resultsRouter);
 // Home page
 app.get("/", (req, res) => {
     res.sendFile(
-        path.join(__dirname, "../public", "index.html")
+        path.join(__dirname, "../client", "index.html")
     );
 });
 
