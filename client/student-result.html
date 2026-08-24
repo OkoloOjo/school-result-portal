@@ -1,65 +1,133 @@
-<!DOCTYPE html>
-<html lang="en">
+const resultForm = document.getElementById("resultForm");
+const studentIdInput = document.getElementById("studentId");
+const resultMessage = document.getElementById("resultMessage");
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+if (resultForm) {
 
-    <title>Student Result - School Result Portal</title>
+    resultForm.addEventListener("submit", async function (event) {
 
-    <link rel="stylesheet" href="css/style.css">
-</head>
+        event.preventDefault();
 
-<body>
+        const studentId = studentIdInput.value.trim();
 
-    <header class="header">
-        <h1>Student Result</h1>
-        <p>View your academic result</p>
-    </header>
+        if (!studentId) {
+            resultMessage.innerHTML =
+                "<p class='error'>Please enter your Student ID.</p>";
+            return;
+        }
 
-    <main class="container">
+        resultMessage.innerHTML =
+            "<p>Loading result...</p>";
 
-        <section class="hero">
+        try {
 
-            <h2>Check Your Result</h2>
+            const response =
+                await fetch(`/api/results/${studentId}`);
 
-            <p>
-                Enter your student ID to view your academic result.
-            </p>
+            const data = await response.json();
 
-            <form id="resultForm">
+            if (!response.ok) {
 
-                <input
-                    type="text"
-                    id="studentId"
-                    placeholder="Enter Student ID"
-                    required
-                >
+                resultMessage.innerHTML = `
+                    <p class="error">
+                        ${data.error || "Result not found."}
+                    </p>
+                `;
 
-                <button type="submit" class="btn">
-                    View Result
-                </button>
+                return;
+            }
 
-            </form>
+            let total = 0;
 
-            <div id="resultMessage"></div>
+            data.results.forEach(result => {
+                total += Number(result.score);
+            });
 
-            <br>
+            const average =
+                total / data.results.length;
 
-            <a href="index.html" class="btn secondary">
-                Back to Home
-            </a>
+            resultMessage.innerHTML = `
+                <div class="result-card">
 
-        </section>
+                    <h2>Student Result</h2>
 
-    </main>
+                    <p>
+                        <strong>Student ID:</strong>
+                        ${data.studentId}
+                    </p>
 
+                    <table class="result-table">
 
-<footer>
-    <p>&copy; 2026 School Result Portal</p>
-</footer>
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Score</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
 
-<script src="js/student-result.js"></script>
+                        <tbody>
 
-</body>
-</html>
+                            ${data.results.map(result => {
+
+                                const score = Number(result.score);
+
+                                let grade;
+
+                                if (score >= 70) {
+                                    grade = "A";
+                                } else if (score >= 60) {
+                                    grade = "B";
+                                } else if (score >= 50) {
+                                    grade = "C";
+                                } else if (score >= 45) {
+                                    grade = "D";
+                                } else if (score >= 40) {
+                                    grade = "E";
+                                } else {
+                                    grade = "F";
+                                }
+
+                                return `
+                                    <tr>
+                                        <td>${result.subject}</td>
+                                        <td>${score}</td>
+                                        <td>${grade}</td>
+                                    </tr>
+                                `;
+
+                            }).join("")}
+
+                        </tbody>
+
+                    </table>
+
+                    <div class="result-summary">
+
+                        <p>
+                            <strong>Total:</strong>
+                            ${total}
+                        </p>
+
+                        <p>
+                            <strong>Average:</strong>
+                            ${average.toFixed(2)}
+                        </p>
+
+                    </div>
+
+                </div>
+            `;
+
+        } catch (error) {
+
+            console.error(error);
+
+            resultMessage.innerHTML = `
+                <p class="error">
+                    Unable to connect to the server.
+                </p>
+            `;
+        }
+    });
+}
