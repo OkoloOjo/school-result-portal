@@ -9,15 +9,25 @@ function addStudent(req, res) {
 
     const {
         studentId,
-        name,
-        className
+        fullName,
+        gender,
+        className,
+        session,
+        term
     } = req.body;
 
 
-    if (!studentId || !name || !className) {
+    if (
+        !studentId ||
+        !fullName ||
+        !gender ||
+        !className ||
+        !session ||
+        !term
+    ) {
 
         return res.status(400).json({
-            message: "Student ID, name and class are required."
+            message: "All student fields are required."
         });
 
     }
@@ -27,26 +37,39 @@ function addStudent(req, res) {
 
         const statement = db.prepare(`
             INSERT INTO students
-            (student_id, name, class_name)
-            VALUES (?, ?, ?)
+            (
+                student_id,
+                full_name,
+                gender,
+                class_name,
+                session,
+                term
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
         `);
 
 
         statement.run(
             studentId,
-            name,
-            className
+            fullName,
+            gender,
+            className,
+            session,
+            term
         );
 
 
         res.status(201).json({
 
-            message: "Student added successfully.",
+            message: "Student added successfully!",
 
             student: {
                 studentId,
-                name,
-                className
+                fullName,
+                gender,
+                className,
+                session,
+                term
             }
 
         });
@@ -57,17 +80,26 @@ function addStudent(req, res) {
         console.error(error);
 
 
-        if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+        if (
+            error.code ===
+            "SQLITE_CONSTRAINT_UNIQUE"
+        ) {
 
             return res.status(409).json({
-                message: "Student ID already exists."
+
+                message:
+                    "A student with this ID already exists."
+
             });
 
         }
 
 
         res.status(500).json({
-            message: "Failed to add student."
+
+            message:
+                "Unable to add student."
+
         });
 
     }
@@ -87,11 +119,16 @@ function getStudents(req, res) {
             SELECT
                 id,
                 student_id,
-                name,
+                full_name,
+                gender,
                 class_name,
+                session,
+                term,
                 created_at
+
             FROM students
-            ORDER BY name ASC
+
+            ORDER BY full_name ASC
         `).all();
 
 
@@ -104,7 +141,10 @@ function getStudents(req, res) {
 
 
         res.status(500).json({
-            message: "Failed to retrieve students."
+
+            message:
+                "Unable to retrieve students."
+
         });
 
     }
@@ -129,10 +169,15 @@ function getStudent(req, res) {
             SELECT
                 id,
                 student_id,
-                name,
+                full_name,
+                gender,
                 class_name,
+                session,
+                term,
                 created_at
+
             FROM students
+
             WHERE student_id = ?
         `).get(studentId);
 
@@ -140,7 +185,10 @@ function getStudent(req, res) {
         if (!student) {
 
             return res.status(404).json({
-                message: "Student not found."
+
+                message:
+                    "Student not found."
+
             });
 
         }
@@ -155,7 +203,10 @@ function getStudent(req, res) {
 
 
         res.status(500).json({
-            message: "Failed to retrieve student."
+
+            message:
+                "Unable to retrieve student."
+
         });
 
     }
@@ -163,8 +214,16 @@ function getStudent(req, res) {
 }
 
 
+// ========================================
+// EXPORT
+// ========================================
+
 module.exports = {
+
     addStudent,
+
     getStudents,
+
     getStudent
+
 };
