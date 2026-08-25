@@ -1,133 +1,107 @@
-const resultForm = document.getElementById("resultForm");
-const studentIdInput = document.getElementById("studentId");
-const resultMessage = document.getElementById("resultMessage");
+<!DOCTYPE html>
+<html lang="en">
 
-if (resultForm) {
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    resultForm.addEventListener("submit", async function (event) {
+    <title>Student Result - School Result Portal</title>
 
-        event.preventDefault();
+    <link rel="stylesheet" href="css/style.css">
+</head>
 
-        const studentId = studentIdInput.value.trim();
+<body>
 
-        if (!studentId) {
-            resultMessage.innerHTML =
-                "<p class='error'>Please enter your Student ID.</p>";
-            return;
-        }
+    <header class="header">
 
-        resultMessage.innerHTML =
-            "<p>Loading result...</p>";
+        <h1>School Result Portal</h1>
 
-        try {
+        <p>Student Result</p>
 
-            const response =
-                await fetch(`/api/results/${studentId}`);
+    </header>
 
-            const data = await response.json();
 
-            if (!response.ok) {
+    <main class="login-container">
 
-                resultMessage.innerHTML = `
-                    <p class="error">
-                        ${data.error || "Result not found."}
-                    </p>
-                `;
+        <div class="login-card">
 
-                return;
-            }
+            <h2>Check Result</h2>
 
-            let total = 0;
+            <p class="login-description">
+                Enter your Student ID to view your result.
+            </p>
 
-            data.results.forEach(result => {
-                total += Number(result.score);
-            });
 
-            const average =
-                total / data.results.length;
+            <form id="studentResultForm">
 
-            resultMessage.innerHTML = `
-                <div class="result-card">
+                <div class="form-group">
 
-                    <h2>Student Result</h2>
+                    <label for="studentId">
+                        Student ID
+                    </label>
 
-                    <p>
-                        <strong>Student ID:</strong>
-                        ${data.studentId}
-                    </p>
-
-                    <table class="result-table">
-
-                        <thead>
-                            <tr>
-                                <th>Subject</th>
-                                <th>Score</th>
-                                <th>Grade</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            ${data.results.map(result => {
-
-                                const score = Number(result.score);
-
-                                let grade;
-
-                                if (score >= 70) {
-                                    grade = "A";
-                                } else if (score >= 60) {
-                                    grade = "B";
-                                } else if (score >= 50) {
-                                    grade = "C";
-                                } else if (score >= 45) {
-                                    grade = "D";
-                                } else if (score >= 40) {
-                                    grade = "E";
-                                } else {
-                                    grade = "F";
-                                }
-
-                                return `
-                                    <tr>
-                                        <td>${result.subject}</td>
-                                        <td>${score}</td>
-                                        <td>${grade}</td>
-                                    </tr>
-                                `;
-
-                            }).join("")}
-
-                        </tbody>
-
-                    </table>
-
-                    <div class="result-summary">
-
-                        <p>
-                            <strong>Total:</strong>
-                            ${total}
-                        </p>
-
-                        <p>
-                            <strong>Average:</strong>
-                            ${average.toFixed(2)}
-                        </p>
-
-                    </div>
+                    <input
+                        type="text"
+                        id="studentId"
+                        name="studentId"
+                        placeholder="Enter your Student ID"
+                        required
+                    >
 
                 </div>
-            `;
 
-        } catch (error) {
 
-            console.error(error);
+                <button
+                    type="submit"
+                    class="btn">
+                    View Result
+                </button>
 
-            resultMessage.innerHTML = `
-                <p class="error">
-                    Unable to connect to the server.
-                </p>
-            `;
-        }
-    });
-}
+            </form>
+
+
+            <div id="resultMessage"></div>
+
+        </div>
+
+
+        <section
+            id="resultContainer"
+            class="login-card"
+            style="display: none;">
+
+            <h2>Student Result</h2>
+
+            <div id="studentDetails"></div>
+
+            <div id="resultTable"></div>
+
+            <div id="resultSummary"></div>
+
+            <br>
+
+            <button
+                id="printResult"
+                class="btn">
+                Print Result
+            </button>
+
+        </section>
+
+    </main>
+
+
+    <footer class="footer">
+
+        <p>
+            &copy; 2026 School Result Portal
+        </p>
+
+    </footer>
+
+
+    <script src="js/result.js"></script>
+
+</body>
+
+</html>
