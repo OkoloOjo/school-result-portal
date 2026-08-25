@@ -1,55 +1,170 @@
 const db = require("../database/database");
 
-// Add a result
-function addResult(req, res) {
+
+// ========================================
+// ADD STUDENT
+// ========================================
+
+function addStudent(req, res) {
 
     const {
         studentId,
-        subject,
-        score
+        name,
+        className
     } = req.body;
 
-    if (!studentId || !subject || score === undefined) {
+
+    if (!studentId || !name || !className) {
+
         return res.status(400).json({
-            error: "Student ID, subject and score are required."
+            message: "Student ID, name and class are required."
         });
+
     }
 
-    if (score < 0 || score > 100) {
-        return res.status(400).json({
-            error: "Score must be between 0 and 100."
-        });
-    }
 
     try {
 
         const statement = db.prepare(`
-            INSERT INTO results
-            (student_id, subject, score)
+            INSERT INTO students
+            (student_id, name, class_name)
             VALUES (?, ?, ?)
         `);
 
+
         statement.run(
             studentId,
-            subject,
-            score
+            name,
+            className
         );
 
+
         res.status(201).json({
-            message: "Result added successfully!"
+
+            message: "Student added successfully.",
+
+            student: {
+                studentId,
+                name,
+                className
+            }
+
         });
+
 
     } catch (error) {
 
         console.error(error);
 
+
+        if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
+
+            return res.status(409).json({
+                message: "Student ID already exists."
+            });
+
+        }
+
+
         res.status(500).json({
-            error: error.message
+            message: "Failed to add student."
         });
 
     }
+
 }
 
+
+// ========================================
+// GET ALL STUDENTS
+// ========================================
+
+function getStudents(req, res) {
+
+    try {
+
+        const students = db.prepare(`
+            SELECT
+                id,
+                student_id,
+                name,
+                class_name,
+                created_at
+            FROM students
+            ORDER BY name ASC
+        `).all();
+
+
+        res.json(students);
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        res.status(500).json({
+            message: "Failed to retrieve students."
+        });
+
+    }
+
+}
+
+
+// ========================================
+// GET ONE STUDENT
+// ========================================
+
+function getStudent(req, res) {
+
+    const {
+        studentId
+    } = req.params;
+
+
+    try {
+
+        const student = db.prepare(`
+            SELECT
+                id,
+                student_id,
+                name,
+                class_name,
+                created_at
+            FROM students
+            WHERE student_id = ?
+        `).get(studentId);
+
+
+        if (!student) {
+
+            return res.status(404).json({
+                message: "Student not found."
+            });
+
+        }
+
+
+        res.json(student);
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        res.status(500).json({
+            message: "Failed to retrieve student."
+        });
+
+    }
+
+}
+
+
 module.exports = {
-    addResult
+    addStudent,
+    getStudents,
+    getStudent
 };
