@@ -684,10 +684,10 @@ document.addEventListener("DOMContentLoaded", function () {
                             : total / results.length;
 
 
-                    const grade =
-                        data.summary
-                            ? data.summary.grade
-                            : calculateGrade(average);
+            const grade =
+    data.summary
+        ? data.summary.grade
+        : "N/A";
 
 
                     resultSummary.innerHTML = `
