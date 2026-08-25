@@ -1,32 +1,103 @@
+
 const express = require("express");
 const path = require("path");
 
-const studentsRouter = require("./routes/students");
-const resultsRouter = require("./routes/results");
+// Import routes
+const authRoutes = require("./routes/auth");
+const studentRoutes = require("./routes/students");
+const resultRoutes = require("./routes/results");
+
+// Import database
+require("./database/database");
 
 const app = express();
+
 const PORT = process.env.PORT || 3000;
 
-// Allow JSON requests
+
+// ========================================
+// MIDDLEWARE
+// ========================================
+
 app.use(express.json());
 
-// Serve frontend from client folder
-app.use(express.static(path.join(__dirname, "../client")));
+app.use(
+    express.urlencoded({
+        extended: true
+    })
+);
 
-// Student API
-app.use("/api/students", studentsRouter);
 
-// Results API
-app.use("/api/results", resultsRouter);
+// ========================================
+// SERVE FRONTEND
+// ========================================
 
-// Home page
+app.use(
+    express.static(
+        path.join(__dirname, "..", "client")
+    )
+);
+
+
+// ========================================
+// API ROUTES
+// ========================================
+
+app.use(
+    "/api/auth",
+    authRoutes
+);
+
+app.use(
+    "/api/students",
+    studentRoutes
+);
+
+app.use(
+    "/api/results",
+    resultRoutes
+);
+
+
+// ========================================
+// HOME PAGE
+// ========================================
+
 app.get("/", (req, res) => {
+
     res.sendFile(
-        path.join(__dirname, "../client", "index.html")
+        path.join(
+            __dirname,
+            "..",
+            "client",
+            "login.html"
+        )
     );
+
 });
 
-// Start server
-app.listen(PORT, "0.0.0.0", () => {
-    console.log(`School Result Portal running on port ${PORT}`);
+
+// ========================================
+// 404 ERROR
+// ========================================
+
+app.use((req, res) => {
+
+    res.status(404).json({
+        message: "Route not found"
+    });
+
+});
+
+
+// ========================================
+// START SERVER
+// ========================================
+
+app.listen(PORT, () => {
+
+    console.log(
+        `School Result Portal running on port ${PORT}`
+    );
+
 });
