@@ -6,21 +6,30 @@ const studentController =
     require("../controllers/studentController");
 
 
-// Add student
+// ========================================
+// ADD STUDENT
+// ========================================
+
 router.post(
     "/",
     studentController.addStudent
 );
 
 
-// Get all students
+// ========================================
+// GET ALL STUDENTS
+// ========================================
+
 router.get(
     "/",
     studentController.getStudents
 );
 
 
-// Get one student
+// ========================================
+// GET ONE STUDENT
+// ========================================
+
 router.get(
     "/:studentId",
     studentController.getStudent
