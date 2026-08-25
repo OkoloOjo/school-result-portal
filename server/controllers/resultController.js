@@ -1,6 +1,4 @@
-
-
-        const db = require("../database/database");
+const db = require("../database/database");
 
 
 // ========================================
@@ -60,44 +58,18 @@ function addResult(req, res) {
 
     try {
 
-        let student = db.prepare(`
+        const student = db.prepare(`
             SELECT *
             FROM students
             WHERE student_id = ?
         `).get(studentId);
 
 
-        // Create student if not found
         if (!student) {
 
-            if (!studentName) {
-
-                return res.status(404).json({
-                    message: "Student not found."
-                });
-
-            }
-
-
-            const insertStudent = db.prepare(`
-                INSERT INTO students
-                (student_id, name, class_name)
-                VALUES (?, ?, ?)
-            `);
-
-
-            insertStudent.run(
-                studentId,
-                studentName,
-                "Not assigned"
-            );
-
-
-            student = db.prepare(`
-                SELECT *
-                FROM students
-                WHERE student_id = ?
-            `).get(studentId);
+            return res.status(404).json({
+                message: "Student not found. Add the student first."
+            });
 
         }
 
@@ -108,7 +80,12 @@ function addResult(req, res) {
 
         const statement = db.prepare(`
             INSERT INTO results
-            (student_id, subject, score, grade)
+            (
+                student_id,
+                subject,
+                score,
+                grade
+            )
             VALUES (?, ?, ?, ?)
         `);
 
@@ -128,8 +105,8 @@ function addResult(req, res) {
 
             result: {
                 id: result.lastInsertRowid,
-                studentId,
-                studentName: student.name,
+                studentId: student.student_id,
+                studentName: student.full_name,
                 subject,
                 score: numericScore,
                 grade
@@ -164,17 +141,18 @@ function getResults(req, res) {
             SELECT
                 results.id,
                 results.student_id,
-                students.name AS student_name,
+                students.full_name AS student_name,
                 students.class_name,
                 results.subject,
                 results.score,
                 results.grade
+
             FROM results
 
             LEFT JOIN students
             ON results.student_id = students.student_id
 
-            ORDER BY students.name ASC
+            ORDER BY students.full_name ASC
         `).all();
 
 
@@ -212,11 +190,15 @@ function getStudentResults(req, res) {
             SELECT
                 results.id,
                 results.student_id,
-                students.name AS student_name,
+                students.full_name AS student_name,
                 students.class_name,
+                students.gender,
+                students.session,
+                students.term,
                 results.subject,
                 results.score,
                 results.grade
+
             FROM results
 
             LEFT JOIN students
@@ -255,19 +237,43 @@ function getStudentResults(req, res) {
         res.json({
 
             student: {
-                studentId,
-                name: results[0].student_name,
-                className: results[0].class_name
+
+                studentId:
+                    results[0].student_id,
+
+                name:
+                    results[0].student_name,
+
+                className:
+                    results[0].class_name,
+
+                gender:
+                    results[0].gender,
+
+                session:
+                    results[0].session,
+
+                term:
+                    results[0].term
+
             },
+
 
             results,
 
+
             summary: {
+
                 total,
-                average: Number(
-                    average.toFixed(2)
-                ),
-                grade: overallGrade
+
+                average:
+                    Number(
+                        average.toFixed(2)
+                    ),
+
+                grade:
+                    overallGrade
+
             }
 
         });
@@ -287,8 +293,16 @@ function getStudentResults(req, res) {
 }
 
 
+// ========================================
+// EXPORT FUNCTIONS
+// ========================================
+
 module.exports = {
+
     addResult,
+
     getResults,
+
     getStudentResults
+
 };
