@@ -1,23 +1,58 @@
-const db = require("../database/database");
+
+
+        const db = require("../database/database");
 
 
 // ========================================
-// ADD STUDENT
+// CALCULATE GRADE
 // ========================================
 
-function addStudent(req, res) {
+function calculateGrade(score) {
+
+    if (score >= 70) return "A";
+    if (score >= 60) return "B";
+    if (score >= 50) return "C";
+    if (score >= 45) return "D";
+    if (score >= 40) return "E";
+
+    return "F";
+}
+
+
+// ========================================
+// ADD RESULT
+// ========================================
+
+function addResult(req, res) {
 
     const {
         studentId,
-        name,
-        className
+        studentName,
+        subject,
+        score
     } = req.body;
 
 
-    if (!studentId || !name || !className) {
+    if (!studentId || !subject || score === undefined) {
 
         return res.status(400).json({
-            message: "Student ID, name and class are required."
+            message: "Student ID, subject and score are required."
+        });
+
+    }
+
+
+    const numericScore = Number(score);
+
+
+    if (
+        Number.isNaN(numericScore) ||
+        numericScore < 0 ||
+        numericScore > 100
+    ) {
+
+        return res.status(400).json({
+            message: "Score must be between 0 and 100."
         });
 
     }
@@ -25,28 +60,79 @@ function addStudent(req, res) {
 
     try {
 
+        let student = db.prepare(`
+            SELECT *
+            FROM students
+            WHERE student_id = ?
+        `).get(studentId);
+
+
+        // Create student if not found
+        if (!student) {
+
+            if (!studentName) {
+
+                return res.status(404).json({
+                    message: "Student not found."
+                });
+
+            }
+
+
+            const insertStudent = db.prepare(`
+                INSERT INTO students
+                (student_id, name, class_name)
+                VALUES (?, ?, ?)
+            `);
+
+
+            insertStudent.run(
+                studentId,
+                studentName,
+                "Not assigned"
+            );
+
+
+            student = db.prepare(`
+                SELECT *
+                FROM students
+                WHERE student_id = ?
+            `).get(studentId);
+
+        }
+
+
+        const grade =
+            calculateGrade(numericScore);
+
+
         const statement = db.prepare(`
-            INSERT INTO students
-            (student_id, name, class_name)
-            VALUES (?, ?, ?)
+            INSERT INTO results
+            (student_id, subject, score, grade)
+            VALUES (?, ?, ?, ?)
         `);
 
 
-        statement.run(
-            studentId,
-            name,
-            className
-        );
+        const result =
+            statement.run(
+                studentId,
+                subject,
+                numericScore,
+                grade
+            );
 
 
         res.status(201).json({
 
-            message: "Student added successfully.",
+            message: "Result added successfully.",
 
-            student: {
+            result: {
+                id: result.lastInsertRowid,
                 studentId,
-                name,
-                className
+                studentName: student.name,
+                subject,
+                score: numericScore,
+                grade
             }
 
         });
@@ -57,17 +143,8 @@ function addStudent(req, res) {
         console.error(error);
 
 
-        if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
-
-            return res.status(409).json({
-                message: "Student ID already exists."
-            });
-
-        }
-
-
         res.status(500).json({
-            message: "Failed to add student."
+            message: "Failed to save result."
         });
 
     }
@@ -76,26 +153,32 @@ function addStudent(req, res) {
 
 
 // ========================================
-// GET ALL STUDENTS
+// GET ALL RESULTS
 // ========================================
 
-function getStudents(req, res) {
+function getResults(req, res) {
 
     try {
 
-        const students = db.prepare(`
+        const results = db.prepare(`
             SELECT
-                id,
-                student_id,
-                name,
-                class_name,
-                created_at
-            FROM students
-            ORDER BY name ASC
+                results.id,
+                results.student_id,
+                students.name AS student_name,
+                students.class_name,
+                results.subject,
+                results.score,
+                results.grade
+            FROM results
+
+            LEFT JOIN students
+            ON results.student_id = students.student_id
+
+            ORDER BY students.name ASC
         `).all();
 
 
-        res.json(students);
+        res.json(results);
 
 
     } catch (error) {
@@ -104,7 +187,7 @@ function getStudents(req, res) {
 
 
         res.status(500).json({
-            message: "Failed to retrieve students."
+            message: "Failed to retrieve results."
         });
 
     }
@@ -113,10 +196,10 @@ function getStudents(req, res) {
 
 
 // ========================================
-// GET ONE STUDENT
+// GET STUDENT RESULTS
 // ========================================
 
-function getStudent(req, res) {
+function getStudentResults(req, res) {
 
     const {
         studentId
@@ -125,28 +208,69 @@ function getStudent(req, res) {
 
     try {
 
-        const student = db.prepare(`
+        const results = db.prepare(`
             SELECT
-                id,
-                student_id,
-                name,
-                class_name,
-                created_at
-            FROM students
-            WHERE student_id = ?
-        `).get(studentId);
+                results.id,
+                results.student_id,
+                students.name AS student_name,
+                students.class_name,
+                results.subject,
+                results.score,
+                results.grade
+            FROM results
+
+            LEFT JOIN students
+            ON results.student_id = students.student_id
+
+            WHERE results.student_id = ?
+
+            ORDER BY results.subject ASC
+        `).all(studentId);
 
 
-        if (!student) {
+        if (results.length === 0) {
 
             return res.status(404).json({
-                message: "Student not found."
+                message: "No results found for this student."
             });
 
         }
 
 
-        res.json(student);
+        const total = results.reduce(
+            (sum, result) =>
+                sum + Number(result.score),
+            0
+        );
+
+
+        const average =
+            total / results.length;
+
+
+        const overallGrade =
+            calculateGrade(average);
+
+
+        res.json({
+
+            student: {
+                studentId,
+                name: results[0].student_name,
+                className: results[0].class_name
+            },
+
+            results,
+
+            summary: {
+                total,
+                average: Number(
+                    average.toFixed(2)
+                ),
+                grade: overallGrade
+            }
+
+        });
 
 
     } catch (error) {
@@ -155,7 +279,7 @@ function getStudent(req, res) {
 
 
         res.status(500).json({
-            message: "Failed to retrieve student."
+            message: "Failed to retrieve student results."
         });
 
     }
@@ -164,7 +288,7 @@ function getStudent(req, res) {
 
 
 module.exports = {
-    addStudent,
-    getStudents,
-    getStudent
+    addResult,
+    getResults,
+    getStudentResults
 };
