@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Teacher Dashboard - School Result Portal</title>
+    <title>Dashboard - School Result Portal</title>
 
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -13,44 +13,72 @@
 <body>
 
     <header class="header">
-        <h1>Teacher Dashboard</h1>
-        <p>Manage students and academic results</p>
+
+        <h1>School Result Portal</h1>
+
+        <p>Teacher Dashboard</p>
+
     </header>
 
-    <main class="container">
 
-        <section class="hero">
+    <main class="dashboard-container">
 
-            <h2>Welcome, Teacher</h2>
+        <section class="dashboard-card">
 
-            <p>
-                Choose an action below to manage the school results.
+            <h2>Teacher Dashboard</h2>
+
+            <p id="welcomeMessage">
+                Welcome, Teacher
             </p>
 
-            <div class="buttons">
+        </section>
 
-                <a href="add-student.html" class="btn">
-                    Add Student
-                </a>
 
-                <a href="add-result.html" class="btn">
-                    Add Result
-                </a>
+        <section class="dashboard-actions">
 
-                <a href="index.html" class="btn secondary">
-                    Back to Home
-                </a>
+            <a href="add-result.html" class="dashboard-btn">
+                Add Result
+            </a>
 
+            <a href="result.html" class="dashboard-btn">
+                View Result
+            </a>
+
+            <button id="logoutButton" class="dashboard-btn logout-btn">
+                Logout
+            </button>
+
+        </section>
+
+
+        <section class="dashboard-info">
+
+            <div class="info-card">
+                <h3>Students</h3>
+                <p id="studentCount">0</p>
+            </div>
+
+            <div class="info-card">
+                <h3>Results</h3>
+                <p id="resultCount">0</p>
             </div>
 
         </section>
 
     </main>
 
-    <footer>
-        <p>&copy; 2026 School Result Portal</p>
+
+    <footer class="footer">
+
+        <p>
+            &copy; 2026 School Result Portal
+        </p>
+
     </footer>
-<script>script.js</script>
+
+
+    <script src="js/dashboard.js"></script>
+
 </body>
 
 </html>
