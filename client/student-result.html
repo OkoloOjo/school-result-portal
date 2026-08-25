@@ -3,11 +3,18 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Student Result - School Result Portal</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="css/style.css">
+    <title>View Student Result</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
 </head>
 
 <body>
@@ -16,16 +23,16 @@
 
         <h1>School Result Portal</h1>
 
-        <p>Student Result</p>
+        <p>Student Result Portal</p>
 
     </header>
 
 
     <main class="login-container">
 
-        <div class="login-card">
+        <section class="login-card">
 
-            <h2>Check Result</h2>
+            <h2>View Your Result</h2>
 
             <p class="login-description">
                 Enter your Student ID to view your result.
@@ -44,7 +51,7 @@
                         type="text"
                         id="studentId"
                         name="studentId"
-                        placeholder="Enter your Student ID"
+                        placeholder="Enter Student ID"
                         required
                     >
 
@@ -53,7 +60,8 @@
 
                 <button
                     type="submit"
-                    class="btn">
+                    class="btn"
+                >
                     View Result
                 </button>
 
@@ -62,27 +70,33 @@
 
             <div id="resultMessage"></div>
 
-        </div>
+        </section>
 
 
         <section
             id="resultContainer"
-            class="login-card"
-            style="display: none;">
+            class="dashboard-card"
+            style="display: none;"
+        >
 
             <h2>Student Result</h2>
 
+
             <div id="studentDetails"></div>
+
 
             <div id="resultTable"></div>
 
+
             <div id="resultSummary"></div>
 
-            <br>
 
             <button
+                type="button"
                 id="printResult"
-                class="btn">
+                class="btn"
+                style="margin-top: 20px;"
+            >
                 Print Result
             </button>
 
