@@ -1,171 +1,790 @@
-// ========================================
-// ADD STUDENT
-// ========================================
+document.addEventListener("DOMContentLoaded", function () {
 
-const studentForm = document.getElementById("studentForm");
+    /*
+    ========================================
+    GET CURRENT PAGE
+    ========================================
+    */
 
-if (studentForm) {
+    const currentPage =
+        window.location.pathname.split("/").pop();
 
-    studentForm.addEventListener("submit", async function (event) {
 
-        event.preventDefault();
+    /*
+    ========================================
+    LOGIN PAGE
+    ========================================
+    */
 
-        const studentId =
-            document.getElementById("studentId").value.trim();
+    const loginForm =
+        document.getElementById("loginForm");
 
-        const fullName =
-            document.getElementById("fullName").value.trim();
 
-        const gender =
-            document.getElementById("gender").value;
+    if (loginForm) {
 
-        const className =
-            document.getElementById("className").value;
+        const loginMessage =
+            document.getElementById("loginMessage");
 
-        const session =
-            document.getElementById("session").value.trim();
 
-        const term =
-            document.getElementById("term").value;
+        loginForm.addEventListener("submit", async function (event) {
 
-        const message =
-            document.getElementById("message");
+            event.preventDefault();
 
-        try {
 
-            const response = await fetch("/api/students", {
+            const username =
+                document.getElementById("username").value.trim();
 
-                method: "POST",
+            const password =
+                document.getElementById("password").value.trim();
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+            const role =
+                document.getElementById("role").value;
 
-                body: JSON.stringify({
-                    studentId,
-                    fullName,
-                    gender,
-                    className,
-                    session,
-                    term
-                })
 
-            });
+            if (!username || !password || !role) {
 
-            const data = await response.json();
+                loginMessage.innerHTML =
+                    "<p style='color:red;'>Please fill in all fields.</p>";
 
-            if (response.ok) {
-
-                message.textContent =
-                    data.message || "Student added successfully!";
-
-                message.className = "success";
-
-                studentForm.reset();
-
-            } else {
-
-                message.textContent =
-                    data.error || "Unable to add student.";
-
-                message.className = "error";
+                return;
             }
 
-        } catch (error) {
 
-            console.error(error);
-
-            message.textContent =
-                "Unable to connect to the server.";
-
-            message.className = "error";
-        }
-    });
-}
+            loginMessage.innerHTML =
+                "<p>Logging in...</p>";
 
 
-// ========================================
-// ADD RESULT
-// ========================================
+            try {
 
-const resultForm = document.getElementById("resultForm");
+                const response = await fetch("/api/auth/login", {
 
-if (resultForm) {
+                    method: "POST",
 
-    resultForm.addEventListener("submit", async function (event) {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
 
-        event.preventDefault();
+                    body: JSON.stringify({
+                        username,
+                        password,
+                        role
+                    })
 
-        const studentId =
-            document.getElementById("studentId").value.trim();
+                });
 
-        const subject =
-            document.getElementById("subject").value.trim();
 
-        const score =
-            Number(document.getElementById("score").value);
+                const data =
+                    await response.json();
 
-        const resultMessage =
-            document.getElementById("resultMessage");
 
-        // Check score
+                if (!response.ok) {
 
-        if (score < 0 || score > 100) {
+                    loginMessage.innerHTML =
+                        `<p style="color:red;">
+                            ${data.message || "Login failed."}
+                        </p>`;
 
-            resultMessage.textContent =
-                "Score must be between 0 and 100.";
+                    return;
+                }
 
-            resultMessage.className = "error";
+
+                localStorage.setItem(
+                    "user",
+                    JSON.stringify(data.user)
+                );
+
+
+                if (role === "teacher") {
+
+                    window.location.href =
+                        "dashboard.html";
+
+                } else {
+
+                    window.location.href =
+                        "result.html";
+
+                }
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                loginMessage.innerHTML =
+                    "<p style='color:red;'>Unable to connect to the server.</p>";
+
+            }
+
+        });
+
+    }
+
+
+    /*
+    ========================================
+    DASHBOARD PAGE
+    ========================================
+    */
+
+    const logoutButton =
+        document.getElementById("logoutButton");
+
+
+    if (logoutButton) {
+
+        const savedUser =
+            localStorage.getItem("user");
+
+
+        if (!savedUser) {
+
+            window.location.href =
+                "login.html";
 
             return;
         }
 
+
+        let user;
+
+
         try {
 
-            const response = await fetch("/api/results", {
-
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-                    studentId,
-                    subject,
-                    score
-                })
-
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-
-                resultMessage.textContent =
-                    data.message || "Result saved successfully!";
-
-                resultMessage.className = "success";
-
-                resultForm.reset();
-
-            } else {
-
-                resultMessage.textContent =
-                    data.error || "Unable to save result.";
-
-                resultMessage.className = "error";
-            }
-
+            user =
+                JSON.parse(savedUser);
 
         } catch (error) {
 
-            console.error(error);
+            localStorage.removeItem("user");
 
-            resultMessage.textContent =
-                "Unable to connect to the server.";
+            window.location.href =
+                "login.html";
 
-            resultMessage.className = "error";
+            return;
         }
-    });
-}
+
+
+        if (user.role !== "teacher") {
+
+            window.location.href =
+                "result.html";
+
+            return;
+        }
+
+
+        const welcomeMessage =
+            document.getElementById("welcomeMessage");
+
+
+        const studentCount =
+            document.getElementById("studentCount");
+
+
+        const resultCount =
+            document.getElementById("resultCount");
+
+
+        if (welcomeMessage) {
+
+            welcomeMessage.textContent =
+                `Welcome, ${user.username}`;
+
+        }
+
+
+        async function loadDashboardData() {
+
+            try {
+
+                const studentResponse =
+                    await fetch("/api/students");
+
+
+                if (studentResponse.ok) {
+
+                    const students =
+                        await studentResponse.json();
+
+
+                    if (studentCount) {
+
+                        studentCount.textContent =
+                            Array.isArray(students)
+                                ? students.length
+                                : 0;
+
+                    }
+
+                }
+
+
+                const resultResponse =
+                    await fetch("/api/results");
+
+
+                if (resultResponse.ok) {
+
+                    const results =
+                        await resultResponse.json();
+
+
+                    if (resultCount) {
+
+                        resultCount.textContent =
+                            Array.isArray(results)
+                                ? results.length
+                                : 0;
+
+                    }
+
+                }
+
+
+            } catch (error) {
+
+                console.error(
+                    "Dashboard error:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        loadDashboardData();
+
+
+        logoutButton.addEventListener(
+            "click",
+            function () {
+
+                localStorage.removeItem("user");
+
+                window.location.href =
+                    "login.html";
+
+            }
+        );
+
+    }
+
+
+    /*
+    ========================================
+    ADD RESULT PAGE
+    ========================================
+    */
+
+    const resultForm =
+        document.getElementById("resultForm");
+
+
+    if (resultForm) {
+
+        const savedUser =
+            localStorage.getItem("user");
+
+
+        if (!savedUser) {
+
+            window.location.href =
+                "login.html";
+
+            return;
+        }
+
+
+        let user;
+
+
+        try {
+
+            user =
+                JSON.parse(savedUser);
+
+        } catch (error) {
+
+            localStorage.removeItem("user");
+
+            window.location.href =
+                "login.html";
+
+            return;
+        }
+
+
+        if (user.role !== "teacher") {
+
+            window.location.href =
+                "result.html";
+
+            return;
+        }
+
+
+        const resultMessage =
+            document.getElementById("resultMessage");
+
+
+        resultForm.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+
+                const studentId =
+                    document
+                        .getElementById("studentId")
+                        .value
+                        .trim();
+
+
+                const studentName =
+                    document
+                        .getElementById("studentName")
+                        .value
+                        .trim();
+
+
+                const subject =
+                    document
+                        .getElementById("subject")
+                        .value
+                        .trim();
+
+
+                const score =
+                    Number(
+                        document
+                            .getElementById("score")
+                            .value
+                    );
+
+
+                if (
+                    !studentId ||
+                    !studentName ||
+                    !subject
+                ) {
+
+                    resultMessage.innerHTML =
+                        "<p style='color:red;'>Please fill in all fields.</p>";
+
+                    return;
+                }
+
+
+                if (
+                    Number.isNaN(score) ||
+                    score < 0 ||
+                    score > 100
+                ) {
+
+                    resultMessage.innerHTML =
+                        "<p style='color:red;'>Score must be between 0 and 100.</p>";
+
+                    return;
+                }
+
+
+                resultMessage.innerHTML =
+                    "<p>Saving result...</p>";
+
+
+                try {
+
+                    const response =
+                        await fetch("/api/results", {
+
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+
+                            body: JSON.stringify({
+                                studentId,
+                                studentName,
+                                subject,
+                                score
+                            })
+
+                        });
+
+
+                    const data =
+                        await response.json();
+
+
+                    if (!response.ok) {
+
+                        resultMessage.innerHTML =
+                            `<p style="color:red;">
+                                ${data.message || "Failed to save result."}
+                            </p>`;
+
+                        return;
+                    }
+
+
+                    resultMessage.innerHTML =
+                        "<p style='color:green;'>Result saved successfully!</p>";
+
+
+                    resultForm.reset();
+
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    resultMessage.innerHTML =
+                        "<p style='color:red;'>Unable to connect to the server.</p>";
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /*
+    ========================================
+    STUDENT RESULT PAGE
+    ========================================
+    */
+
+    const studentResultForm =
+        document.getElementById("studentResultForm");
+
+
+    if (studentResultForm) {
+
+        const resultMessage =
+            document.getElementById("resultMessage");
+
+
+        const resultContainer =
+            document.getElementById("resultContainer");
+
+
+        const studentDetails =
+            document.getElementById("studentDetails");
+
+
+        const resultTable =
+            document.getElementById("resultTable");
+
+
+        const resultSummary =
+            document.getElementById("resultSummary");
+
+
+        const printResult =
+            document.getElementById("printResult");
+
+
+        studentResultForm.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+
+                const studentId =
+                    document
+                        .getElementById("studentId")
+                        .value
+                        .trim();
+
+
+                if (!studentId) {
+
+                    resultMessage.innerHTML =
+                        "<p style='color:red;'>Please enter your Student ID.</p>";
+
+                    return;
+                }
+
+
+                resultMessage.innerHTML =
+                    "<p>Loading result...</p>";
+
+
+                resultContainer.style.display =
+                    "none";
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            `/api/results/student/${encodeURIComponent(studentId)}`
+                        );
+
+
+                    const data =
+                        await response.json();
+
+
+                    if (!response.ok) {
+
+                        resultMessage.innerHTML =
+                            `<p style="color:red;">
+                                ${data.message || "Result not found."}
+                            </p>`;
+
+                        return;
+                    }
+
+
+                    const results =
+                        data.results || [];
+
+
+                    if (results.length === 0) {
+
+                        resultMessage.innerHTML =
+                            "<p style='color:red;'>No result found.</p>";
+
+                        return;
+                    }
+
+
+                    const student =
+                        data.student || {};
+
+
+                    studentDetails.innerHTML = `
+                        <p>
+                            <strong>Student ID:</strong>
+                            ${student.studentId || studentId}
+                        </p>
+
+                        <p>
+                            <strong>Student Name:</strong>
+                            ${student.name || "Student"}
+                        </p>
+
+                        <p>
+                            <strong>Class:</strong>
+                            ${student.className || "N/A"}
+                        </p>
+                    `;
+
+
+                    let tableHTML = `
+
+                        <table style="
+                            width:100%;
+                            border-collapse:collapse;
+                            margin-top:20px;
+                        ">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th style="
+                                        border:1px solid #ccc;
+                                        padding:10px;
+                                    ">
+                                        Subject
+                                    </th>
+
+                                    <th style="
+                                        border:1px solid #ccc;
+                                        padding:10px;
+                                    ">
+                                        Score
+                                    </th>
+
+                                    <th style="
+                                        border:1px solid #ccc;
+                                        padding:10px;
+                                    ">
+                                        Grade
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+                    `;
+
+
+                    results.forEach(function (result) {
+
+                        tableHTML += `
+
+                            <tr>
+
+                                <td style="
+                                    border:1px solid #ccc;
+                                    padding:10px;
+                                ">
+                                    ${result.subject}
+                                </td>
+
+                                <td style="
+                                    border:1px solid #ccc;
+                                    padding:10px;
+                                    text-align:center;
+                                ">
+                                    ${result.score}
+                                </td>
+
+                                <td style="
+                                    border:1px solid #ccc;
+                                    padding:10px;
+                                    text-align:center;
+                                ">
+                                    ${result.grade}
+                                </td>
+
+                            </tr>
+
+                        `;
+
+                    });
+
+
+                    tableHTML += `
+
+                            </tbody>
+
+                        </table>
+
+                    `;
+
+
+                    resultTable.innerHTML =
+                        tableHTML;
+
+
+                    const total =
+                        data.summary
+                            ? data.summary.total
+                            : results.reduce(
+                                (sum, result) =>
+                                    sum + Number(result.score),
+                                0
+                            );
+
+
+                    const average =
+                        data.summary
+                            ? data.summary.average
+                            : total / results.length;
+
+
+                    const grade =
+                        data.summary
+                            ? data.summary.grade
+                            : calculateGrade(average);
+
+
+                    resultSummary.innerHTML = `
+
+                        <div style="
+                            margin-top:20px;
+                            padding:15px;
+                            background:#f4f7f6;
+                            border-radius:6px;
+                        ">
+
+                            <p>
+                                <strong>Total Score:</strong>
+                                ${total}
+                            </p>
+
+                            <p>
+                                <strong>Average:</strong>
+                                ${Number(average).toFixed(2)}
+                            </p>
+
+                            <p>
+                                <strong>Overall Grade:</strong>
+                                ${grade}
+                            </p>
+
+                        </div>
+
+                    `;
+
+
+                    resultMessage.innerHTML =
+                        "<p style='color:green;'>Result loaded successfully.</p>";
+
+
+                    resultContainer.style.display =
+                        "block";
+
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    resultMessage.innerHTML =
+                        "<p style='color:red;'>Unable to connect to the server.</p>";
+
+                }
+
+            }
+        );
+
+
+        if (printResult) {
+
+            printResult.addEventListener(
+                "click",
+                function () {
+
+                    window.print();
+
+                }
+            );
+
+        }
+
+    }
+
+
+    /*
+    ========================================
+    GRADE FUNCTION
+    ========================================
+    */
+
+    function calculateGrade(score) {
+
+        if (score >= 70) {
+            return "A";
+        }
+
+        if (score >= 60) {
+            return "B";
+        }
+
+        if (score >= 50) {
+            return "C";
+        }
+
+        if (score >= 45) {
+            return "D";
+        }
+
+        if (score >= 40) {
+            return "E";
+        }
+
+        return "F";
+    }
+
+});
