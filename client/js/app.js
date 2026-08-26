@@ -100,9 +100,8 @@ document.addEventListener("DOMContentLoaded", function () {
 window.location.href = "result.html";
                 } else {
 
-                    window.location.href =
-                        "result.html";
-
+                    
+window.location.href = "student-result.html";
                 }
 
 
