@@ -18,8 +18,8 @@
     "url": "https://github.com/OkoloOjo/school-result-portal/issues"
   },
   "homepage": "https://github.com/OkoloOjo/school-result-portal#readme",
-  
-}"dependencies": {
+  "dependencies": {
     "express": "^5.2.1",
     "better-sqlite3": "^11.3.0"
+  }
 }
