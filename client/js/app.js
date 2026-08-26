@@ -752,7 +752,115 @@ window.location.href = "student-result.html";
         }
 
     }
+/*
+========================================
+ADD STUDENT PAGE
+========================================
+*/
 
+const studentForm =
+    document.getElementById("studentForm");
+
+
+if (studentForm) {
+
+    const message =
+        document.getElementById("message");
+
+
+    studentForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            const studentId =
+                document.getElementById("studentId").value.trim();
+
+            const fullName =
+                document.getElementById("fullName").value.trim();
+
+            const gender =
+                document.getElementById("gender").value;
+
+            const className =
+                document.getElementById("className").value;
+
+            const session =
+                document.getElementById("session").value.trim();
+
+            const term =
+                document.getElementById("term").value;
+
+
+            if (!studentId || !fullName || !gender || !className || !session || !term) {
+
+                message.innerHTML =
+                    "<p style='color:red;'>Please fill in all fields.</p>";
+
+                return;
+            }
+
+
+            message.innerHTML =
+                "<p>Saving student...</p>";
+
+
+            try {
+
+                const response = await fetch("/api/students", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        studentId,
+                        fullName,
+                        gender,
+                        className,
+                        session,
+                        term
+                    })
+
+                });
+
+
+                const data = await response.json();
+
+
+                if (!response.ok) {
+
+                    message.innerHTML =
+                        `<p style="color:red;">${data.message || "Failed to add student."}</p>`;
+
+                    return;
+                }
+
+
+                message.innerHTML =
+                    "<p style='color:green;'>Student added successfully!</p>";
+
+
+                studentForm.reset();
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                message.innerHTML =
+                    "<p style='color:red;'>Unable to connect to the server.</p>";
+
+            }
+
+        }
+    );
+
+}
 
     /*
     ========================================
