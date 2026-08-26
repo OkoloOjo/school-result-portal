@@ -96,9 +96,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (role === "teacher") {
 
-                    window.location.href =
-                        "dashboard.html";
-
+                    
+window.location.href = "result.html";
                 } else {
 
                     window.location.href =
