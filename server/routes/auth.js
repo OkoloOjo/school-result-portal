@@ -67,6 +67,38 @@ router.post("/login", (req, res) => {
     });
 
 });
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client("184102525492-61u1ham3hio96rpkj3ga1uve3psrolsb.apps.googleusercontent.com");
 
+const TEACHER_EMAILS = [
+    "youractualemail@gmail.com"
+];
+
+router.post("/google-login", async (req, res) => {
+
+    const { token } = req.body;
+
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: "184102525492-61u1ham3hio96rpkj3ga1uve3psrolsb.apps.googleusercontent.com"
+        });
+
+        const payload = ticket.getPayload();
+        const email = payload.email;
+        const name = payload.name;
+
+        const role = TEACHER_EMAILS.includes(email) ? "teacher" : "student";
+
+        return res.json({
+            message: "Google login successful.",
+            user: { username: name, email, role }
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(401).json({ message: "Invalid Google token." });
+    }
+});
 
 module.exports = router;
