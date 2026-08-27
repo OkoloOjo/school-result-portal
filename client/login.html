@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - School Result Portal</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
 <body>
@@ -28,31 +29,16 @@
 
             <div class="form-group">
                 <label for="username">Username</label>
-
-                <input
-                    type="text"
-                    id="username"
-                    name="username"
-                    placeholder="Enter username"
-                    required
-                >
+                <input type="text" id="username" name="username" placeholder="Enter username" required>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Enter password"
-                    required
-                >
+                <input type="password" id="password" name="password" placeholder="Enter password" required>
             </div>
 
             <div class="form-group">
                 <label for="role">Login As</label>
-
                 <select id="role" name="role" required>
                     <option value="">Select role</option>
                     <option value="teacher">Teacher</option>
@@ -66,6 +52,14 @@
 
         </form>
 
+        <div class="divider" style="text-align:center; margin: 16px 0; color:#888;">OR</div>
+
+        <div id="g_id_onload"
+             data-client_id="184102525492-61u1ham3hio96rpkj3ga1uve3psrolsb.apps.googleusercontent.com"
+             data-callback="handleGoogleLogin">
+        </div>
+        <div class="g_id_signin" data-type="standard" style="display:flex; justify-content:center;"></div>
+
         <div id="loginMessage"></div>
 
     </div>
@@ -75,6 +69,7 @@
 <footer class="footer">
     <p>&copy; 2026 School Result Portal</p>
 </footer>
+
 <script src="js/app.js"></script>
 
 </body>
