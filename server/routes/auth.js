@@ -70,7 +70,7 @@ router.post("/login", (req, res) => {
 const { OAuth2Client } = require("google-auth-library");
 const client = new OAuth2Client("184102525492-61u1ham3hio96rpkj3ga1uve3psrolsb.apps.googleusercontent.com");
 
-const const TEACHER_EMAILS = [
+cconst TEACHER_EMAILS = [
     "okoloojonugwa155@gmail.com"
 ];
 ];
