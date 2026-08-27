@@ -11,6 +11,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     /*
+    function handleGoogleLogin(response) {
+
+    const loginMessage = document.getElementById("loginMessage");
+
+    loginMessage.innerHTML = "<p>Logging in with Google...</p>";
+
+    fetch("/api/auth/google-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: response.credential })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (!data.user) {
+            loginMessage.innerHTML =
+                `<p style="color:red;">${data.message || "Google login failed."}</p>`;
+            return;
+        }
+
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        if (data.user.role === "teacher") {
+            window.location.href = "dashboard.html";
+        } else {
+            window.location.href = "student-result.html";
+        }
+
+    })
+    .catch(error => {
+        console.error(error);
+        loginMessage.innerHTML =
+            "<p style='color:red;'>Unable to connect to the server.</p>";
+    });
+
+}
     ========================================
     LOGIN PAGE
     ========================================
