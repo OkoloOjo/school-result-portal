@@ -73,7 +73,7 @@ const client = new OAuth2Client("184102525492-61u1ham3hio96rpkj3ga1uve3psrolsb.a
 const TEACHER_EMAILS = [
     "okoloojonugwa155@gmail.com"
 ];
-];
+
 
 router.post("/google-login", async (req, res) => {
 
