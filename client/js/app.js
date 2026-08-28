@@ -1,19 +1,10 @@
+/*
+========================================
+GOOGLE LOGIN HANDLER
+========================================
+*/
 
-    /*
-    ========================================
-    GET CURRENT PAGE
-    ========================================
-    */
-
-document.addEventListener("DOMContentLoaded", function () {
-
-
-    const currentPage =
-        window.location.pathname.split("/").pop();
-
-
-    
-    function handleGoogleLogin(response) {
+function handleGoogleLogin(response) {
 
     const loginMessage = document.getElementById("loginMessage");
 
@@ -49,6 +40,21 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 }
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /*
+    ========================================
+    GET CURRENT PAGE
+    ========================================
+    */
+
+    const currentPage =
+        window.location.pathname.split("/").pop();
+
+
+    /*
     ========================================
     LOGIN PAGE
     ========================================
@@ -134,13 +140,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (role === "teacher") {
 
-    
-window.location.href = "dashboard.html";
-} else {
+                    window.location.href = "dashboard.html";
+                } else {
 
-    
-window.location.href = "student-result.html";
-}
+                    window.location.href = "student-result.html";
+                }
 
 
             } catch (error) {
@@ -720,10 +724,10 @@ window.location.href = "student-result.html";
                             : total / results.length;
 
 
-            const grade =
-    data.summary
-        ? data.summary.grade
-        : "N/A";
+                    const grade =
+                        data.summary
+                            ? data.summary.grade
+                            : "N/A";
 
 
                     resultSummary.innerHTML = `
@@ -790,115 +794,118 @@ window.location.href = "student-result.html";
         }
 
     }
-/*
-========================================
-ADD STUDENT PAGE
-========================================
-*/
-
-const studentForm =
-    document.getElementById("studentForm");
 
 
-if (studentForm) {
+    /*
+    ========================================
+    ADD STUDENT PAGE
+    ========================================
+    */
 
-    const message =
-        document.getElementById("message");
-
-
-    studentForm.addEventListener(
-        "submit",
-        async function (event) {
-
-            event.preventDefault();
+    const studentForm =
+        document.getElementById("studentForm");
 
 
-            const studentId =
-                document.getElementById("studentId").value.trim();
+    if (studentForm) {
 
-            const fullName =
-                document.getElementById("fullName").value.trim();
-
-            const gender =
-                document.getElementById("gender").value;
-
-            const className =
-                document.getElementById("className").value;
-
-            const session =
-                document.getElementById("session").value.trim();
-
-            const term =
-                document.getElementById("term").value;
+        const message =
+            document.getElementById("message");
 
 
-            if (!studentId || !fullName || !gender || !className || !session || !term) {
+        studentForm.addEventListener(
+            "submit",
+            async function (event) {
 
-                message.innerHTML =
-                    "<p style='color:red;'>Please fill in all fields.</p>";
-
-                return;
-            }
+                event.preventDefault();
 
 
-            message.innerHTML =
-                "<p>Saving student...</p>";
+                const studentId =
+                    document.getElementById("studentId").value.trim();
+
+                const fullName =
+                    document.getElementById("fullName").value.trim();
+
+                const gender =
+                    document.getElementById("gender").value;
+
+                const className =
+                    document.getElementById("className").value;
+
+                const session =
+                    document.getElementById("session").value.trim();
+
+                const term =
+                    document.getElementById("term").value;
 
 
-            try {
-
-                const response = await fetch("/api/students", {
-
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        studentId,
-                        fullName,
-                        gender,
-                        className,
-                        session,
-                        term
-                    })
-
-                });
-
-
-                const data = await response.json();
-
-
-                if (!response.ok) {
+                if (!studentId || !fullName || !gender || !className || !session || !term) {
 
                     message.innerHTML =
-                        `<p style="color:red;">${data.message || "Failed to add student."}</p>`;
+                        "<p style='color:red;'>Please fill in all fields.</p>";
 
                     return;
                 }
 
 
                 message.innerHTML =
-                    "<p style='color:green;'>Student added successfully!</p>";
+                    "<p>Saving student...</p>";
 
 
-                studentForm.reset();
+                try {
+
+                    const response = await fetch("/api/students", {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            studentId,
+                            fullName,
+                            gender,
+                            className,
+                            session,
+                            term
+                        })
+
+                    });
 
 
-            } catch (error) {
+                    const data = await response.json();
 
-                console.error(error);
 
-                message.innerHTML =
-                    "<p style='color:red;'>Unable to connect to the server.</p>";
+                    if (!response.ok) {
+
+                        message.innerHTML =
+                            `<p style="color:red;">${data.message || "Failed to add student."}</p>`;
+
+                        return;
+                    }
+
+
+                    message.innerHTML =
+                        "<p style='color:green;'>Student added successfully!</p>";
+
+
+                    studentForm.reset();
+
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    message.innerHTML =
+                        "<p style='color:red;'>Unable to connect to the server.</p>";
+
+                }
 
             }
+        );
 
-        }
-    );
+    }
 
-}
 
     /*
     ========================================
