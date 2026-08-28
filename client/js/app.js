@@ -1,16 +1,57 @@
-document.addEventListener("DOMContentLoaded", function () {
 
     /*
     ========================================
     GET CURRENT PAGE
     ========================================
     */
+function handleGoogleLogin(response) {
+
+    const loginMessage = document.getElementById("loginMessage");
+
+    loginMessage.innerHTML = "<p>Logging in with Google...</p>";
+
+    fetch("/api/auth/google-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: response.credential })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (!data.user) {
+            loginMessage.innerHTML =
+                `<p style="color:red;">${data.message || "Google login failed."}</p>`;
+            return;
+        }
+
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        if (data.user.role === "teacher") {
+            window.location.href = "dashboard.html";
+        } else {
+            window.location.href = "student-result.html";
+        }
+
+    })
+    .catch(error => {
+        console.error(error);
+        loginMessage.innerHTML =
+            "<p style='color:red;'>Unable to connect to the server.</p>";
+    });
+
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    // ... rest of your existing code stays here unchanged
+});
+document.addEventListener("DOMContentLoaded", function () {
+
 
     const currentPage =
         window.location.pathname.split("/").pop();
 
 
-    /*
+    
     function handleGoogleLogin(response) {
 
     const loginMessage = document.getElementById("loginMessage");
